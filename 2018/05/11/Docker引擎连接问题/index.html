@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="kb" />
+  <meta name="keywords" content="docker," />
 
 
 
@@ -95,6 +95,7 @@
 
 
 <meta name="description" content="环境 Docker Toolbox on Windows全家桶 Win7 x64 旗舰版  起因在使用docker-maven-plugin插件将项目打包成docker镜像时，遇到了如下问题：  Failed to execute goal com.spotify:docker-maven-plugin:0.4.12:build (default-cli) on project demo: Exc">
+<meta name="keywords" content="docker">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Docker引擎连接问题">
 <meta property="og:url" content="http://iamkb.pro/2018/05/11/Docker引擎连接问题/index.html">
@@ -105,7 +106,7 @@
 <meta property="og:image" content="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-11/54699049.jpg">
 <meta property="og:image" content="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-11/32684987.jpg">
 <meta property="og:image" content="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-11/11587286.jpg">
-<meta property="og:updated_time" content="2018-05-18T07:18:42.765Z">
+<meta property="og:updated_time" content="2018-05-18T10:21:33.794Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Docker引擎连接问题">
 <meta name="twitter:description" content="环境 Docker Toolbox on Windows全家桶 Win7 x64 旗舰版  起因在使用docker-maven-plugin插件将项目打包成docker镜像时，遇到了如下问题：  Failed to execute goal com.spotify:docker-maven-plugin:0.4.12:build (default-cli) on project demo: Exc">
@@ -406,6 +407,7 @@
 <blockquote>
 <p>Failed to execute goal com.spotify:docker-maven-plugin:0.4.12:build (default-cli) on project demo: Exception caught:<br> Timeout: GET <a href="https://192.168.99.101:2376/version" target="_blank" rel="noopener">https://192.168.99.101:2376/version</a>: com.spotify.docker.client.shaded.javax.ws.rs.ProcessingException: org.apache.http.conn.ConnectTimeoutException: Connect to 192.168.99.101:2376 [/192.168.99.101] failed: connect timed out -&gt; [Help 1]</p>
 </blockquote>
+<a id="more"></a>
 <h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>显然，docker连接的时候炸了，但是我的docker还是能正常使用，说明是哪里配置又不对劲了！</p>
 <h1 id="解决过程"><a href="#解决过程" class="headerlink" title="解决过程"></a>解决过程</h1><p>1.使用全家桶之Kitematic (Alpha)连接下docker引擎，出现<br><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-11/97740222.jpg" alt="image"></p>
 <blockquote>
@@ -434,6 +436,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
       
 
       
@@ -550,6 +558,15 @@
             </div>
           
 
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
           
 
         </nav>

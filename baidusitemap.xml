@@ -3,15 +3,16 @@
 
 
     
-    
   <url>
     <loc>http://iamkb.pro/2018/05/11/Docker%E5%BC%95%E6%93%8E%E8%BF%9E%E6%8E%A5%E9%97%AE%E9%A2%98/</loc>
-    <lastmod>2018-05-18T07:18:42.765Z</lastmod>
+    <lastmod>2018-05-18T10:21:33.794Z</lastmod>
     <data>
         <display>
         <title>Docker引擎连接问题</title>
         <pubTime>2018-05-11T10:10:08.000Z</pubTime>
         
+        <tag>docker</tag>
+         
          
            
              
@@ -27,12 +28,16 @@
     
   <url>
     <loc>http://iamkb.pro/2018/05/18/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%AE%9E%E8%B7%B5/</loc>
-    <lastmod>2018-05-18T07:10:00.085Z</lastmod>
+    <lastmod>2018-05-18T10:21:21.273Z</lastmod>
     <data>
         <display>
         <title>Mysql主从复制实践</title>
         <pubTime>2018-05-18T06:55:37.000Z</pubTime>
         
+        <tag>mysql</tag>
+         
+        <tag>主从复制</tag>
+         
          
            
              
@@ -45,6 +50,7 @@
     </data>
     </url>
 
+    
     
     
   <url>

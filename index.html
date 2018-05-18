@@ -397,8 +397,7 @@
 
       
         
-          
-            <h1 id="Mysql主从复制"><a href="#Mysql主从复制" class="headerlink" title="Mysql主从复制"></a>Mysql主从复制</h1><p>MySQL主从复制是其最重要的功能之一。主从复制是指一台服务器充当主数据库服务器，另一台或多台服务器充当从数据库服务器，主服务器中的数据自动复制到从服务器之中。对于多级复制，数据库服务器即可充当主机，也可充当从机。MySQL主从复制的基础是主服务器对数据库修改记录二进制日志，从服务器通过主服务器的二进制日志自动执行更新。</p>
+          <h1 id="Mysql主从复制"><a href="#Mysql主从复制" class="headerlink" title="Mysql主从复制"></a>Mysql主从复制</h1><p>MySQL主从复制是其最重要的功能之一。主从复制是指一台服务器充当主数据库服务器，另一台或多台服务器充当从数据库服务器，主服务器中的数据自动复制到从服务器之中。对于多级复制，数据库服务器即可充当主机，也可充当从机。MySQL主从复制的基础是主服务器对数据库修改记录二进制日志，从服务器通过主服务器的二进制日志自动执行更新。</p>
 <p>优点：</p>
 <ul>
 <li>将读操作和写操作分离到不同的数据库上，避免主服务器出现性能瓶颈；</li>
@@ -412,45 +411,13 @@
 <li>数据不同步容灾并不完全可靠;</li>
 </ul>
 <p>所以说，Mysql主从复制可以归类为：有一定冗余度的非一致性异步副本（不可靠不同步），对于没有严格一致性要求的系统，可以定制为分担负载、查询过时报表的一种措施。</p>
-<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
-<li><strong>mysql数据库x2</strong></li>
-</ul>
-<p>这边我使用docker启动mysql数据库，命令：</p>
-<p>主数据库(master):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name mysql-master -v /docker/mysql/mysql0:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=hkb -p 3308:3306 -d mysql:5.6</span><br></pre></td></tr></table></figure></p>
-<p>从数据库(slave):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name mysql-slave -v /docker/mysql/mysql1:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=hkb -p 3309:3306 -d mysql:5.6</span><br></pre></td></tr></table></figure></p>
-<p><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-18/72801261.jpg" alt="2台mysql数据库"></p>
-<p>通过<code>-v /docker/mysql/mysql0:/etc/mysql/conf.d</code> 将配置文件挂载进去，方便配置</p>
-<p><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-18/26696231.jpg" alt="mysql配置文件"></p>
-<p>进入mysql容器，查询ip地址:</p>
-<p><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-18/91788408.jpg" alt="查询容器ip"></p>
-<p>主数据库ip：172.17.0.3</p>
-<p>从数据库ip：172.17.0.4</p>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><ol>
-<li>在mysql-master上创建一个用户‘repl’，并允许其他Slave服务器可以通过远程访问Master，通过该用户读取二进制日志，实现数据同步。</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt;create user repl;</span><br><span class="line"></span><br><span class="line">mysql&gt;GRANT REPLICATION SLAVE ON *.* TO &apos;repl&apos;@&apos;172.17.0.%&apos; IDENTIFIED BY &apos;hkb&apos;;</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>修改mysql-master的配置文件，完成后重启容器</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line"></span><br><span class="line">server-id=1  </span><br><span class="line">log-bin=master-bin</span><br><span class="line">log-bin-index=master-bin.index</span><br></pre></td></tr></table></figure>
-<p>编辑完成后，<strong>将配置文件更改为只读文件，否则会被mysql忽略</strong>。重启后，进入容器，执行:<code>SHOW MASTER STATUS</code>,确认开启bin日志</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW MASTER STATUS;</span><br><span class="line">+-------------------+----------+--------------+------------------+</span><br><span class="line">| File | Position | Binlog_Do_DB | Binlog_Ignore_DB |</span><br><span class="line">+-------------------+----------+--------------+------------------+</span><br><span class="line">| master-bin.000001 | 1285 | | |</span><br><span class="line">+-------------------+----------+--------------+------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li>修改mysql-slave的配置文件，完成后重启容器</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line"></span><br><span class="line">server-id=2</span><br><span class="line">log-bin=mysql-bin</span><br><span class="line">relay-log-index=slave-relay-bin.index</span><br><span class="line">relay-log=slave-relay-bin</span><br></pre></td></tr></table></figure>
-<ol start="4">
-<li>进入slave容器，连接mysql，进行连接master配置</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt;change master to master_host=&apos;172.17.0.3&apos;,master_port=3306,master_user=&apos;repl&apos;,master_password=&apos;hkb&apos;, master_log_file=&apos;master-bin.000001&apos;,master_log_pos=0;</span><br></pre></td></tr></table></figure>
-<p>然后启动slave:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt;start slave;</span><br></pre></td></tr></table></figure></p>
-<p>最后,<code>show slave status \G</code></p>
-<p><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-18/54999238.jpg" alt="slave status"></p>
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>在master数据库进行操作，然后观察slave数据库</p>
-<p><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-18/36110741.jpg" alt="master-slave"></p>
-<p>OK,没有问题！收工。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/18/Mysql主从复制实践/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -611,8 +578,7 @@
 
       
         
-          
-            <h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><ul>
+          <h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><ul>
 <li><a href="https://docs.docker.com/toolbox/toolbox_install_windows/" target="_blank" rel="noopener">Docker Toolbox on Windows</a>全家桶</li>
 <li>Win7 x64 旗舰版</li>
 </ul>
@@ -620,22 +586,13 @@
 <blockquote>
 <p>Failed to execute goal com.spotify:docker-maven-plugin:0.4.12:build (default-cli) on project demo: Exception caught:<br> Timeout: GET <a href="https://192.168.99.101:2376/version" target="_blank" rel="noopener">https://192.168.99.101:2376/version</a>: com.spotify.docker.client.shaded.javax.ws.rs.ProcessingException: org.apache.http.conn.ConnectTimeoutException: Connect to 192.168.99.101:2376 [/192.168.99.101] failed: connect timed out -&gt; [Help 1]</p>
 </blockquote>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>显然，docker连接的时候炸了，但是我的docker还是能正常使用，说明是哪里配置又不对劲了！</p>
-<h1 id="解决过程"><a href="#解决过程" class="headerlink" title="解决过程"></a>解决过程</h1><p>1.使用全家桶之Kitematic (Alpha)连接下docker引擎，出现<br><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-11/97740222.jpg" alt="image"></p>
-<blockquote>
-<p>Cannot connect to the Docker Engine. Either the<br>VM is not responding or the connection may be<br>blocked (VPN or Proxy): Hostname/IP doesn’t<br>match certificate’s altnames: “IP: 192.168.99.100 is<br>not in the cert’s list: 192.168.99.101”</p>
-</blockquote>
-<p>2.查看环境变量，发现DOCKER_HOST不大对劲，地址为192.168.99.101，但是应该是100才对，顺手改掉，<br><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-11/54699049.jpg" alt="image"></p>
-<p>然后进入DOCKER_CERT_PATH,看到config.json文件的ip地址也不对劲，顺手也改掉<br><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-11/32684987.jpg" alt="image"></p>
-<p>3.再次使用Kitematic尝试连接，结果失败！docker-maven-plugin打包也还是不行。进行谷歌，搜到类似：<br><a href="https://github.com/docker/kitematic/issues/519#issuecomment-151953516" target="_blank" rel="noopener">Start-up stops at 99% - IP: 192.168.99.100 is not in the cert’s list:192.168.99.101</a></p>
-<p>应该是认证相关问题，执行以下命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine regenerate-certs default</span><br></pre></td></tr></table></figure>
-<p><img src="http://kb-image.oss-cn-qingdao.aliyuncs.com/18-5-11/11587286.jpg" alt="image"></p>
-<p>4.再次使用Kitematic连接，没问题，maven插件也可以了</p>
-<hr>
-<p>出现这个问题是因为当时装好全家桶后，使用了VirtualBox已经开了一台machine，然后才起的docker，导致docker的虚拟机是在101，后来删除了之前那台，docker回到了100。ip的变化导致的问题！</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/11/Docker引擎连接问题/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -885,6 +842,15 @@
             </div>
           
 
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
           
 
         </nav>
